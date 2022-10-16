@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+//    id 'maven-publish'
+}
+
+group 'com.media.utils.ffmpeg'
+version '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.1'
+}
+
+test {
+    useJUnitPlatform()
+    systemProperty "java.library.path", file("${project(":lib").buildDir}/lib/main/debug/linux").absolutePath
+//    systemProperty "java.library.path", file("${project(":lib").buildDir}/cmake/ffmpeg/linux-amd64").absolutePath
+}
+
+tasks.compileJava.dependsOn ':lib:assemble'
+//tasks.clean.dependsOn 'lib:cmakeClean'
+//tasks.compileJava.dependsOn 'lib:cmakeBuild'

@@ -1,0 +1,34 @@
+import org.gradle.internal.jvm.Jvm
+
+plugins {
+    id 'cpp-library'
+}
+
+library {
+    baseName = 'ffmpeg'
+
+    linkage = [Linkage.SHARED]
+
+    source.from file('src')
+    publicHeaders.from file('/usr/local/ffmpeg/include')
+
+    targetMachines = [machines.linux.x86_64, machines.windows.x86_64]
+
+    binaries.configureEach {
+        def includes = ["${Jvm.current().javaHome}/include"]
+        def osFamily = targetPlatform.targetMachine.operatingSystemFamily
+        if (osFamily.macOs) {
+            includes.add("${Jvm.current().javaHome}/include/darwin")
+        } else if (osFamily.linux) {
+            includes.add("${Jvm.current().javaHome}/include/linux")
+        } else if (osFamily.windows) {
+            includes.add("${Jvm.current().javaHome}/include/win32")
+        }
+        compileTask.get().includes.from(includes)
+
+        linkTask.get().linkerArgs.add("-L/usr/local/ffmpeg/lib")
+        linkTask.get().linkerArgs.addAll(["-lavcodec", "-lavdevice", "-lavfilter", "-lavformat", "-lavutil", "-lpostproc", "-lswscale", "-lswresample"])
+
+    }
+
+}
